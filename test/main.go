@@ -1,16 +1,18 @@
 package main
 
 import (
+	"fmt"
+	"github.com/golang/protobuf/proto"
 	"github.com/zhaocy/gnet"
 	"github.com/zhaocy/gnet/test/pb"
-	"github.com/golang/protobuf/proto"
 )
 
 var gamerMap = map[string]gnet.IMsgQue{}
 
 func C2SHandlerFunc(msgque gnet.IMsgQue, msg *gnet.Message) bool {
+	fmt.Println("-----------------")
 	ppb := msg.C2S().(*pb.Pb)
-	gnet.LogInfo("%v", ppb.GamerLoginC2S)
+	gnet.LogInfo("-> %v", ppb.GamerLoginC2S)
 	gnet.LogInfo("%v", ppb.GamerGlobalChatC2S)
 
 	if ppb.GamerLoginC2S != nil{
