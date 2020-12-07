@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var DefMsgQueTimeout int = 180 //ws默认超时时间s
+var DefMsgQueTimeout int = 180 //默认连接超时时间s
 
 var waitAll = &WaitGroup{} //等待所有goroutine
 var waitAllForLog sync.WaitGroup
