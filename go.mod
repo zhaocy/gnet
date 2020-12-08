@@ -10,5 +10,6 @@ require (
 	github.com/onsi/gomega v1.10.3 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/protobuf v1.23.0
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )

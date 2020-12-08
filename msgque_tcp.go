@@ -463,6 +463,7 @@ func newTcpAccept(conn net.Conn, msgtyp MsgType, handler IMsgHandler, parser IPa
 	if parser != nil {
 		msgque.parser = parser.Get()
 	}
+	msgque.SetCmdReadRaw()
 	msgqueMapSync.Lock()
 	msgqueMap[msgque.id] = &msgque
 	msgqueMapSync.Unlock()
