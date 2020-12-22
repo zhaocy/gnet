@@ -17,9 +17,7 @@ require (
 	go.etcd.io/etcd v3.3.25+incompatible // indirect
 	go.uber.org/zap v1.16.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/grpc v1.34.0 // indirect
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
