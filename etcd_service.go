@@ -2,7 +2,6 @@ package gnet
 
 import (
 	"context"
-	"fmt"
 	"go.etcd.io/etcd/clientv3"
 	"time"
 )
@@ -75,10 +74,8 @@ func (this *ServiceReg) ListenLeaseRespChan() {
 		select {
 		case leaseKeepResp := <-this.keepAliveChan:
 			if leaseKeepResp == nil {
-				fmt.Printf("已经关闭续租功能\n")
+				LogDebug("已经关闭续租功能\n")
 				return
-			} else {
-				fmt.Printf("续租成功\n")
 			}
 		}
 	}
