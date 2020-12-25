@@ -15,6 +15,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/onsi/ginkgo v1.14.2 // indirect
 	github.com/onsi/gomega v1.10.3 // indirect
+	github.com/sony/gobreaker v0.4.1 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible
 	go.etcd.io/etcd v3.3.25+incompatible
 	go.uber.org/zap v1.16.0 // indirect
