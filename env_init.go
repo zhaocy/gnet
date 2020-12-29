@@ -22,25 +22,22 @@ func InitDefaultEnv(c *cli.Context)error{
 
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(configPath)
-	viper.ReadInConfig()
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			panic(errors.New("config file not found"))
+		}
+	}
 	return nil
 }
 
 func InitLog() *logrus.Logger{
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			panic(errors.New("config file not found"))
-		} else {
-			logDir := viper.GetString("log.dir")
-			logMode := viper.GetString("log.level")
-			day := viper.GetInt("log.day")
-			intervalHour := viper.GetInt("log.intervalHour")
-			log, err := vlog.Init(logDir, logMode, day, intervalHour)
-			if err != nil {
-				panic(err)
-			}
-			return log
-		}
+	logDir := viper.GetString("log.dir")
+	logMode := viper.GetString("log.level")
+	day := viper.GetInt("log.day")
+	intervalHour := viper.GetInt("log.intervalHour")
+	log, err := vlog.Init(logDir, logMode, day, intervalHour)
+	if err != nil {
+		panic(err)
 	}
-	return nil
+	return log
 }
