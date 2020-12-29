@@ -27,6 +27,7 @@ func InitDefaultEnv(c *cli.Context)error{
 			panic(errors.New("config file not found"))
 		}
 	}
+	InitLog()
 	return nil
 }
 
