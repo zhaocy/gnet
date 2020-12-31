@@ -29,7 +29,7 @@ func GenHeroExpObj() interface{}{
 }
 
 type Npc struct {
-	Id uint32 `json:"-"`
+	Id uint32 `json:"id"`
 	Name string `json:"-"`
 	Icon string `json:"-"`
 	Model string `json:"-"`
