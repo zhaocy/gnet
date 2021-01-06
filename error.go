@@ -41,6 +41,7 @@ var (
 	ErrGobUnPack      = NewError("gob解析错误", 16)
 	ErrServePanic     = NewError("服务器内部错误", 17)
 	ErrNeedIntraNet   = NewError("需要内网环境", 18)
+	ErrCustomUnPack = NewError("custom解析错误",19)
 	ErrConfigPath     = NewError("配置路径错误", 50)
 
 	ErrFileRead       = NewError("文件读取错误", 100)

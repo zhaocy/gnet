@@ -53,6 +53,8 @@ func (r *Parser) Get() IParser {
 		}
 	case ParserTypeCmd:
 		return &CmdParser{Parser: r}
+	case ParserTypeCustom:
+		return &CustomParser{Parser:r}
 	case ParserTypeRaw:
 		return nil
 	}
