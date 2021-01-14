@@ -21,5 +21,15 @@ func BytesConnect(b1,b2 []byte)[]byte{
 	var buffer bytes.Buffer //Buffer是一个实现了读写方法的可变大小的字节缓冲
 	buffer.Write(b1)
 	buffer.Write(b2)
-	return buffer.Bytes()  //得到了b1+b2的结果
+	return buffer.Bytes()
+}
+
+func BytesCombine(pBytes ...[]byte) []byte {
+	len := len(pBytes)
+	s := make([][]byte, len)
+	for index := 0; index < len; index++ {
+		s[index] = pBytes[index]
+	}
+	sep := []byte("")
+	return bytes.Join(s, sep)
 }
