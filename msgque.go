@@ -470,6 +470,7 @@ func StartServer(addr string, typ MsgType, handler IMsgHandler, parser IParserFa
 			Go(func() {
 				LogDebug("process listen for tcp msgque:%d", msgque.id)
 				msgque.listen()
+				msgque.Send(NewDataMsg([]byte("I get you!")))
 				LogDebug("process listen end for tcp msgque:%d", msgque.id)
 			})
 		} else {
