@@ -32,10 +32,12 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 	return nil, ErrCustomUnPack
 }
 
+//解码接受的数据
 func CustomUnPack(data []byte, msg interface{}) error{
 	if data == nil || msg == nil {
 		return ErrCustomUnPack
 	}
+
 	err := codec.Decode(data, msg)
 	if err != nil {
 		return ErrCustomUnPack
@@ -48,6 +50,7 @@ func (r *CustomParser) PackMsg(v interface{}) []byte {
 	return data
 }
 
+//编码要发送的数据
 func CustomPack(msg interface{}) ([]byte, error) {
 	if msg == nil {
 		return nil, ErrPBPack

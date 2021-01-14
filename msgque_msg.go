@@ -33,6 +33,12 @@ type MessageHead struct {
 	data    []byte //数据
 }
 
+//定义短消息头
+type ShortMessageHead struct {
+	Len uint16
+	Cmd string
+}
+
 func (r *MessageHead) Bytes() []byte {
 	if r.forever && r.data != nil {
 		return r.data
