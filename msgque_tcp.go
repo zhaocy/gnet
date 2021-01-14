@@ -364,7 +364,6 @@ func (r *tcpMsgQue) listen() {
 						msgque.write()
 						LogInfo("process write end for msgque:%d", msgque.id)
 					})
-					msgque.Send(NewDataMsg([]byte("I get you !!!")))
 				} else {
 					msgque.Stop()
 				}
