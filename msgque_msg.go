@@ -36,6 +36,7 @@ type MessageHead struct {
 //定义短消息头
 type ShortMessageHead struct {
 	Cmd string
+	BodyLen uint16
 }
 
 func (r *MessageHead) Bytes() []byte {
