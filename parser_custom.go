@@ -1,6 +1,7 @@
 package gnet
 
 import (
+	"fmt"
 	"github.com/zhaocy/codec"
 )
 
@@ -19,6 +20,7 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 		}
 		for _, p := range r.typeMap {
 			if p.C2S() != nil {
+				fmt.Println("ParseC2S--------------")
 				err := CustomUnPack(msg.Data, p.C2S())
 				if err != nil {
 					continue
@@ -27,7 +29,6 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 				return &p, nil
 			}
 		}
-
 
 	}
 
@@ -70,6 +71,7 @@ func (r *CustomParser) GetRemindMsg(err error, t MsgType) *Message {
 	if t == MsgTypeMsg {
 		return nil
 	} else {
+		fmt.Println("GetRemindMsg--------------")
 		return nil
 	}
 }
