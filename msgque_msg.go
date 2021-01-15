@@ -126,7 +126,7 @@ func NewMessageHead(data []byte) *MessageHead {
 
 
 func (s *MessageShortHead) FromBytes(data []byte) error {
-	if len(data) < MsgShortHeadSize {
+	if len(data) != MsgShortHeadSize {
 		return ErrMsgLenTooShort
 	}
 	phead := (*MessageShortHead)(unsafe.Pointer(&data[0]))

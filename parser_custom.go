@@ -1,7 +1,6 @@
 package gnet
 
 import (
-	"fmt"
 	"github.com/zhaocy/codec"
 )
 
@@ -27,20 +26,21 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 		LogError("short read msg head failed")
 		return nil, ErrCustomUnPack
 	}
-	fmt.Println("head: ",head)
+
+	LogDebug("head %v", headData)
 	msg.ShortHead = head
 	if head.Len > 0 {
-		fmt.Println("data len: ",head.Len)
 		data = make([]byte, head.Len)
 		data = msg.Data[MsgShortHeadSize:]
 		msg.Data = data
+		LogDebug("data len: %v %v",head.Len, msg.Data)
 	}else{
 		return nil, ErrCustomUnPack
 	}
 
 	for _, p := range r.typeMap {
 		if p.C2S() != nil {
-			fmt.Println("ParseC2S--------------")
+
 			err := CustomUnPack(msg.Data, p.C2S())
 			if err != nil {
 				continue
@@ -49,8 +49,6 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 			return &p, nil
 		}
 	}
-
-
 
 	return nil, ErrCustomUnPack
 }
@@ -91,7 +89,6 @@ func (r *CustomParser) GetRemindMsg(err error, t MsgType) *Message {
 	if t == MsgTypeMsg {
 		return nil
 	} else {
-		fmt.Println("GetRemindMsg--------------")
 		return nil
 	}
 }
