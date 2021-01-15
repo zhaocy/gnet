@@ -37,7 +37,7 @@ type msgQue struct {
 	id      uint32        //唯一标识
 	cwrite  chan *Message //写入通道
 	stop    int32         //停止标记
-	msgTyp  MsgType       //消息类型
+	msgType MsgType       //消息类型
 	connTyp ConnType      //通道类型
 
 	handler       IMsgHandler    //处理器
@@ -89,7 +89,7 @@ func (r *msgQue) GetHandler() IMsgHandler {
 }
 
 func (r *msgQue) GetMsgType() MsgType {
-	return r.msgTyp
+	return r.msgType
 }
 
 func (r *msgQue) GetConnType() ConnType {
@@ -340,9 +340,9 @@ func (r *msgQue) processMsgTrue(msgque IMsgQue, msg *Message) bool {
 		} else {
 			if r.parser.GetErrType() == ParseErrTypeSendRemind {
 				if msg.Head != nil {
-					r.Send(r.parser.GetRemindMsg(err, r.msgTyp).CopyTag(msg))
+					r.Send(r.parser.GetRemindMsg(err, r.msgType).CopyTag(msg))
 				} else {
-					r.Send(r.parser.GetRemindMsg(err, r.msgTyp))
+					r.Send(r.parser.GetRemindMsg(err, r.msgType))
 				}
 				return true
 			} else if r.parser.GetErrType() == ParseErrTypeClose {

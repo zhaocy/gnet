@@ -163,7 +163,7 @@ func (r *wsMsgQue) listen() {
 			}
 		} else {
 			Go(func() {
-				msgque := newWsAccept(c, r.msgTyp, r.handler, r.parserFactory)
+				msgque := newWsAccept(c, r.msgType, r.handler, r.parserFactory)
 				if r.handler.OnNewMsgQue(msgque) {
 					msgque.init = true
 					msgque.available = true
@@ -270,7 +270,7 @@ func newWsConn(addr string, conn *websocket.Conn, msgtyp MsgType, handler IMsgHa
 		msgQue: msgQue{
 			id:            atomic.AddUint32(&msgqueId, 1),
 			cwrite:        make(chan *Message, 64),
-			msgTyp:        msgtyp,
+			msgType:       msgtyp,
 			handler:       handler,
 			timeout:       DefMsgQueTimeout,
 			connTyp:       ConnTypeConn,
@@ -297,7 +297,7 @@ func newWsAccept(conn *websocket.Conn, msgtyp MsgType, handler IMsgHandler, pars
 		msgQue: msgQue{
 			id:            atomic.AddUint32(&msgqueId, 1),
 			cwrite:        make(chan *Message, 64),
-			msgTyp:        msgtyp,
+			msgType:       msgtyp,
 			handler:       handler,
 			timeout:       DefMsgQueTimeout,
 			connTyp:       ConnTypeAccept,
@@ -321,7 +321,7 @@ func newWsListen(addr, url string, msgtyp MsgType, handler IMsgHandler, parser I
 	msgque := wsMsgQue{
 		msgQue: msgQue{
 			id:            atomic.AddUint32(&msgqueId, 1),
-			msgTyp:        msgtyp,
+			msgType:       msgtyp,
 			handler:       handler,
 			parserFactory: parser,
 			connTyp:       ConnTypeListen,

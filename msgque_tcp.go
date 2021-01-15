@@ -73,10 +73,8 @@ func (r *tcpMsgQue) RemoteAddr() string {
 
 func (r *tcpMsgQue) readMsg() {
 	headData := make([]byte, MsgHeadSize)
-	shortHeadData:= make([]byte, ShortMsgHeadSize)
 	var data []byte
 	var head *MessageHead
-	var shortHead *MessageShortHead
 	for !r.IsStop() {
 		if head == nil {
 			_, err := io.ReadFull(r.conn, headData)
@@ -87,20 +85,8 @@ func (r *tcpMsgQue) readMsg() {
 				break
 			}
 
-			_, err = io.ReadFull(r.conn, shortHeadData)
-			if err != nil {
-				if err != io.EOF {
-					LogDebug("msgque:%v recv data err:%v", r.id, err)
-				}
-				break
-			}
-
 			if head = NewMessageHead(headData); head == nil {
 				LogError("msgque:%v read msg head failed", r.id)
-				break
-			}
-			if shortHead = NewMessageShortHead(shortHeadData); shortHead == nil{
-				LogError("msgque:%v read msg short head failed", r.id)
 				break
 			}
 
@@ -114,15 +100,6 @@ func (r *tcpMsgQue) readMsg() {
 				data = make([]byte, head.Len)
 			}
 
-			if shortHead.Len == 0{
-				if !r.processMsg(r, &Message{ShortHead:shortHead}){
-					LogError("msgque:%v process msg cmd:%v act:%v", r.id, shortHead.Cmd, shortHead.Act)
-					break
-				}
-				shortHead = nil
-			}else{
-				data = make([]byte, shortHead.Len)
-			}
 		} else {
 			_, err := io.ReadFull(r.conn, data)
 			if err != nil {
@@ -135,13 +112,7 @@ func (r *tcpMsgQue) readMsg() {
 				break
 			}
 
-			if !r.processMsg(r, &Message{ShortHead:shortHead, Data:data}){
-				LogError("msgque:%v process msg cmd:%v act:%v", r.id, shortHead.Cmd, shortHead.Act)
-				break
-			}
-
 			head = nil
-			shortHead = nil
 			data = nil
 		}
 		r.lastTick = Timestamp
@@ -332,9 +303,9 @@ func (r *tcpMsgQue) read() {
 	}()
 
 	r.wait.Add(1)
-	if r.msgTyp == MsgTypeCmd {
+	if r.msgType == MsgTypeCmd{
 		r.readCmd()
-	} else {
+	} else{
 		r.readMsg()
 	}
 }
@@ -352,7 +323,7 @@ func (r *tcpMsgQue) write() {
 		r.Stop()
 	}()
 	r.wait.Add(1)
-	if r.msgTyp == MsgTypeCmd {
+	if r.msgType == MsgTypeCmd {
 		r.writeCmd()
 	} else {
 		if r.sendFast {
@@ -381,7 +352,7 @@ func (r *tcpMsgQue) listen() {
 			break
 		} else {
 			Go(func() {
-				msgque := newTcpAccept(c, r.msgTyp, r.handler, r.parserFactory)
+				msgque := newTcpAccept(c, r.msgType, r.handler, r.parserFactory)
 				if r.handler.OnNewMsgQue(msgque) {
 					msgque.init = true
 					msgque.available = true
@@ -481,7 +452,7 @@ func newTcpAccept(conn net.Conn, msgtyp MsgType, handler IMsgHandler, parser IPa
 		msgQue: msgQue{
 			id:            atomic.AddUint32(&msgqueId, 1),
 			cwrite:        make(chan *Message, 64),
-			msgTyp:        msgtyp,
+			msgType:       msgtyp,
 			handler:       handler,
 			timeout:       DefMsgQueTimeout,
 			connTyp:       ConnTypeAccept,
@@ -506,7 +477,7 @@ func newTcpListen(listener net.Listener, msgtyp MsgType, handler IMsgHandler, pa
 	msgque := tcpMsgQue{
 		msgQue: msgQue{
 			id:            atomic.AddUint32(&msgqueId, 1),
-			msgTyp:        msgtyp,
+			msgType:       msgtyp,
 			handler:       handler,
 			parserFactory: parser,
 			connTyp:       ConnTypeListen,

@@ -17,7 +17,7 @@ func (r *PBParser) ParseC2S(msg *Message) (IMsgParser, error) {
 		if len(msg.Data) == 0 {
 			return nil, ErrPBUnPack
 		}
-		for _, p := range r.typMap {
+		for _, p := range r.typeMap {
 			if p.C2S() != nil {
 				err := PBUnPack(msg.Data, p.C2S())
 				if err != nil {

@@ -40,7 +40,7 @@ type Parser struct {
 	ErrType ParseErrType
 
 	msgMap  map[int]MsgParser
-	typMap  map[reflect.Type]MsgParser
+	typeMap map[reflect.Type]MsgParser
 	cmdRoot *cmdParseNode
 	parser  IParser
 }
@@ -104,10 +104,10 @@ func (r *Parser) RegisterMsgFunc(c2sFunc ParseFunc, s2cFunc ParseFunc) {
 		}
 		registerCmdParser(r.cmdRoot, c2sFunc, s2cFunc)
 	} else {
-		if r.typMap == nil {
-			r.typMap = map[reflect.Type]MsgParser{}
+		if r.typeMap == nil {
+			r.typeMap = map[reflect.Type]MsgParser{}
 		}
-		r.typMap[reflect.TypeOf(c2sFunc())] = MsgParser{c2sFunc: c2sFunc, s2cFunc: s2cFunc}
+		r.typeMap[reflect.TypeOf(c2sFunc())] = MsgParser{c2sFunc: c2sFunc, s2cFunc: s2cFunc}
 	}
 }
 

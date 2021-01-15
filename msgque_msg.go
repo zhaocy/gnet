@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	MsgHeadSize = 12
-	ShortMsgHeadSize = 6
+	MsgHeadSize      = 12
+	MsgShortHeadSize = 6
 )
 const (
 	FlagEncrypt  = 1 << 0 //数据是经过加密的
@@ -128,7 +128,7 @@ func (s *MessageShortHead) CmdAct() int {
 }
 
 func (s *MessageShortHead) FromBytes(data []byte) error {
-	if len(data) < ShortMsgHeadSize {
+	if len(data) < MsgShortHeadSize {
 		return ErrMsgLenTooShort
 	}
 	phead := (*MessageShortHead)(unsafe.Pointer(&data[0]))
