@@ -106,7 +106,7 @@ var stopCheckMap = struct {
 func init() {
 	gmsgArray[gmsgId] = &gMsg{c: make(chan struct{})}
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	//DefLog = NewLog(10000, &ConsoleLogger{true})
-	//DefLog.SetLevel(LogLevelInfo)
+	DefLog = NewLog(10000, &ConsoleLogger{true})
+	DefLog.SetLevel(LogLevelDebug)
 	timerTick()
 }
