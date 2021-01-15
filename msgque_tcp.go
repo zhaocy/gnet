@@ -75,6 +75,7 @@ func (r *tcpMsgQue) readMsg() {
 	headData := make([]byte, MsgHeadSize)
 	var data []byte
 	var head *MessageHead
+
 	for !r.IsStop() {
 		if head == nil {
 			_, err := io.ReadFull(r.conn, headData)

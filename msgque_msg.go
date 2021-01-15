@@ -39,6 +39,7 @@ type MessageShortHead struct {
 	Cmd uint16
 	Act uint16
 	Len uint16 //数据长度
+
 }
 
 func (r *MessageHead) Bytes() []byte {
@@ -123,9 +124,6 @@ func NewMessageHead(data []byte) *MessageHead {
 	return head
 }
 
-func (s *MessageShortHead) CmdAct() int {
-	return CmdActUint16(s.Cmd, s.Act)
-}
 
 func (s *MessageShortHead) FromBytes(data []byte) error {
 	if len(data) < MsgShortHeadSize {
