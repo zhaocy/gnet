@@ -13,7 +13,7 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 		return nil, ErrCustomUnPack
 	}
 
-	if msg.Head == nil {
+	if msg.ShortHead == nil {
 		if len(msg.Data) == 0 {
 			return nil, ErrCustomUnPack
 		}
@@ -27,7 +27,17 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 				return &p, nil
 			}
 		}
-
+	}else if p, ok := r.msgMap[msg.ShortHead.CmdAct()]; ok {
+		if p.C2S() != nil {
+			if len(msg.Data) > 0 {
+				err := CustomUnPack(msg.Data, p.C2S())
+				if err != nil {
+					return nil, err
+				}
+			}
+			p.parser = r
+			return &p, nil
+		}
 	}
 	return nil, ErrCustomUnPack
 }

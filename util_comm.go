@@ -82,6 +82,10 @@ func CmdAct(cmd, act uint8) int {
 	return int(cmd)<<8 + int(act)
 }
 
+func CmdActUint16(cmd, act uint16) int {
+	return int(cmd)<<8 + int(act)
+}
+
 func Tag(cmd, act uint8, index uint16) int {
 	return int(cmd)<<16 + int(act)<<8 + int(index)
 }

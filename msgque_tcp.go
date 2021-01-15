@@ -73,9 +73,10 @@ func (r *tcpMsgQue) RemoteAddr() string {
 
 func (r *tcpMsgQue) readMsg() {
 	headData := make([]byte, MsgHeadSize)
+	shortHeadData:= make([]byte, ShortMsgHeadSize)
 	var data []byte
 	var head *MessageHead
-
+	var shortHead *ShortMessageHead
 	for !r.IsStop() {
 		if head == nil {
 			_, err := io.ReadFull(r.conn, headData)
@@ -85,10 +86,24 @@ func (r *tcpMsgQue) readMsg() {
 				}
 				break
 			}
+
+			_, err = io.ReadFull(r.conn, shortHeadData)
+			if err != nil {
+				if err != io.EOF {
+					LogDebug("msgque:%v recv data err:%v", r.id, err)
+				}
+				break
+			}
+
 			if head = NewMessageHead(headData); head == nil {
 				LogError("msgque:%v read msg head failed", r.id)
 				break
 			}
+			if shortHead = NewShortMessageHead(shortHeadData); shortHead == nil{
+				LogError("msgque:%v read msg short head failed", r.id)
+				break
+			}
+
 			if head.Len == 0 {
 				if !r.processMsg(r, &Message{Head: head}) {
 					LogError("msgque:%v process msg cmd:%v act:%v", r.id, head.Cmd, head.Act)
@@ -97,6 +112,16 @@ func (r *tcpMsgQue) readMsg() {
 				head = nil
 			} else {
 				data = make([]byte, head.Len)
+			}
+
+			if shortHead.Len == 0{
+				if !r.processMsg(r, &Message{ShortHead:shortHead}){
+					LogError("msgque:%v process msg cmd:%v act:%v", r.id, shortHead.Cmd, shortHead.Act)
+					break
+				}
+				shortHead = nil
+			}else{
+				data = make([]byte, shortHead.Len)
 			}
 		} else {
 			_, err := io.ReadFull(r.conn, data)
@@ -110,7 +135,13 @@ func (r *tcpMsgQue) readMsg() {
 				break
 			}
 
+			if !r.processMsg(r, &Message{ShortHead:shortHead, Data:data}){
+				LogError("msgque:%v process msg cmd:%v act:%v", r.id, shortHead.Cmd, shortHead.Act)
+				break
+			}
+
 			head = nil
+			shortHead = nil
 			data = nil
 		}
 		r.lastTick = Timestamp

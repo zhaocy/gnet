@@ -7,6 +7,7 @@ import (
 
 const (
 	MsgHeadSize = 12
+	ShortMsgHeadSize = 6
 )
 const (
 	FlagEncrypt  = 1 << 0 //数据是经过加密的
@@ -35,8 +36,9 @@ type MessageHead struct {
 
 //定义短消息头
 type ShortMessageHead struct {
-	Cmd string
-	BodyLen uint16
+	Cmd uint16
+	Act uint16
+	Len uint16 //数据长度
 }
 
 func (r *MessageHead) Bytes() []byte {
@@ -121,8 +123,35 @@ func NewMessageHead(data []byte) *MessageHead {
 	return head
 }
 
+func (s *ShortMessageHead) CmdAct() int {
+	return CmdActUint16(s.Cmd, s.Act)
+}
+
+func (s *ShortMessageHead) FromBytes(data []byte) error {
+	if len(data) < ShortMsgHeadSize {
+		return ErrMsgLenTooShort
+	}
+	phead := (*ShortMessageHead)(unsafe.Pointer(&data[0]))
+	s.Len = phead.Len
+	s.Cmd = phead.Cmd
+	s.Act = phead.Act
+	if uint32(s.Len)> MaxMsgDataSize{
+		return ErrMsgLenTooLong
+	}
+	return nil
+}
+
+func NewShortMessageHead(data []byte) *ShortMessageHead{
+	shortHead := &ShortMessageHead{}
+	if err:= shortHead.FromBytes(data); err!=nil{
+		return nil
+	}
+	return shortHead
+}
+
 //处理器
 type Message struct {
+	ShortHead *ShortMessageHead
 	Head       *MessageHead //消息头，可能为nil
 	Data       []byte       //消息数据
 	IMsgParser              //解析器
