@@ -76,7 +76,7 @@ func (r *tcpMsgQue) readMsg() {
 	shortHeadData:= make([]byte, ShortMsgHeadSize)
 	var data []byte
 	var head *MessageHead
-	var shortHead *ShortMessageHead
+	var shortHead *MessageShortHead
 	for !r.IsStop() {
 		if head == nil {
 			_, err := io.ReadFull(r.conn, headData)
@@ -99,7 +99,7 @@ func (r *tcpMsgQue) readMsg() {
 				LogError("msgque:%v read msg head failed", r.id)
 				break
 			}
-			if shortHead = NewShortMessageHead(shortHeadData); shortHead == nil{
+			if shortHead = NewMessageShortHead(shortHeadData); shortHead == nil{
 				LogError("msgque:%v read msg short head failed", r.id)
 				break
 			}
