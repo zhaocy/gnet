@@ -142,3 +142,11 @@ func IntToBytes(n int,b byte) ([]byte,error) {
 	}
 	return nil,fmt.Errorf("IntToBytes b param is invaild")
 }
+
+//解析C2S的Head byte
+func HeadByteC2S(byte []byte) []byte{
+	cmdLenByte:= byte[:4]
+	cmdLen := BytesToUint32(cmdLenByte)
+	headLen:= 4+cmdLen+2  //4表示cmd len uint32的字节长度  2表示bodyDataLen uint16
+	return byte[:headLen]
+}
