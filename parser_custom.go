@@ -22,12 +22,15 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 	var data []byte
 	var head *MessageShortHead
 
+	headData = msg.Data[:MsgShortHeadSize]
 	if head = NewMessageShortHead(headData); head == nil {
 		LogError("short read msg head failed")
 		return nil, ErrCustomUnPack
 	}
+	fmt.Println("head: ",head)
 	msg.ShortHead = head
 	if head.Len > 0 {
+		fmt.Println("data len: ",head.Len)
 		data = make([]byte, head.Len)
 		data = msg.Data[MsgShortHeadSize:]
 		msg.Data = data
