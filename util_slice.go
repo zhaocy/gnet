@@ -35,6 +35,7 @@ func NumToRange(numList []int) []string {
 }
 
 
-func NumToString(numList []int) string{
+func Int32ToString(numList []int32) string{
 	return strings.Replace(strings.Trim(fmt.Sprint(numList), "[]"), " ", ",", -1)
 }
+
