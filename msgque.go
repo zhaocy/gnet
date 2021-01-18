@@ -481,7 +481,7 @@ func StartServer(addr string, typ MsgType, factory ...IFactory) error {
 					LogDebug("process listen end for tcp msgque:%d", msgque.id)
 				})
 			}
-
+			LogInfo("tcp listen addr:%s", addr)
 		} else {
 			LogError("listen on %s failed, errstr:%s", addr, err)
 			return err
