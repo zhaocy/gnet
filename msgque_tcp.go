@@ -489,6 +489,6 @@ func newTcpListen(listener net.Listener, msgtyp MsgType, handler IMsgHandler, pa
 	msgqueMapSync.Lock()
 	msgqueMap[msgque.id] = &msgque
 	msgqueMapSync.Unlock()
-	LogInfo("msgque id:%d", msgque.id)
+	LogInfo("msgque id:%d addr:%s", msgque.id,addr)
 	return &msgque
 }
