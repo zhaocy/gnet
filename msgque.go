@@ -462,8 +462,8 @@ type IMsgQue interface {
 }
 
 type IFactory struct {
-	handler IMsgHandler
-	parser IParserFactory
+	Handler IMsgHandler
+	Parser IParserFactory
 }
 
 
@@ -474,7 +474,7 @@ func StartServer(addr string, typ MsgType, factory ...IFactory) error {
 		listen, err := net.Listen("tcp", addrs[1])
 		if err == nil {
 			for _, v:= range factory{
-				msgque := newTcpListen(listen, typ, v.handler, v.parser, addr)
+				msgque := newTcpListen(listen, typ, v.Handler, v.Parser, addr)
 				Go(func() {
 					LogDebug("process listen for tcp msgque:%d", msgque.id)
 					msgque.listen()
@@ -501,7 +501,7 @@ func StartServer(addr string, typ MsgType, factory ...IFactory) error {
 			LogInfo("ws type msgque noly support MsgTypeCmd now auto set to MsgTypeCmd")
 		}
 		for _, v:= range factory{
-			msgque := newWsListen(naddr[0], url, MsgTypeCmd, v.handler, v.parser)
+			msgque := newWsListen(naddr[0], url, MsgTypeCmd, v.Handler, v.Parser)
 			Go(func() {
 				LogDebug("process listen for ws msgque:%d", msgque.id)
 				msgque.listen()
