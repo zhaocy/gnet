@@ -461,17 +461,27 @@ type IMsgQue interface {
 	tryCallback(msg *Message) (re bool) //尝试执行消息回调
 }
 
-func StartServer(addr string, typ MsgType, handler IMsgHandler, parser IParserFactory) error {
+type IFactory struct {
+	handler IMsgHandler
+	parser IParserFactory
+}
+
+
+
+func StartServer(addr string, typ MsgType, factory ...IFactory) error {
 	addrs := strings.Split(addr, "://")
 	if addrs[0] == "tcp" || addrs[0] == "all" {
 		listen, err := net.Listen("tcp", addrs[1])
 		if err == nil {
-			msgque := newTcpListen(listen, typ, handler, parser, addr)
-			Go(func() {
-				LogDebug("process listen for tcp msgque:%d", msgque.id)
-				msgque.listen()
-				LogDebug("process listen end for tcp msgque:%d", msgque.id)
-			})
+			for _, v:= range factory{
+				msgque := newTcpListen(listen, typ, v.handler, v.parser, addr)
+				Go(func() {
+					LogDebug("process listen for tcp msgque:%d", msgque.id)
+					msgque.listen()
+					LogDebug("process listen end for tcp msgque:%d", msgque.id)
+				})
+			}
+
 		} else {
 			LogError("listen on %s failed, errstr:%s", addr, err)
 			return err
@@ -490,12 +500,15 @@ func StartServer(addr string, typ MsgType, handler IMsgHandler, parser IParserFa
 		if typ != MsgTypeCmd {
 			LogInfo("ws type msgque noly support MsgTypeCmd now auto set to MsgTypeCmd")
 		}
-		msgque := newWsListen(naddr[0], url, MsgTypeCmd, handler, parser)
-		Go(func() {
-			LogDebug("process listen for ws msgque:%d", msgque.id)
-			msgque.listen()
-			LogDebug("process listen end for ws msgque:%d", msgque.id)
-		})
+		for _, v:= range factory{
+			msgque := newWsListen(naddr[0], url, MsgTypeCmd, v.handler, v.parser)
+			Go(func() {
+				LogDebug("process listen for ws msgque:%d", msgque.id)
+				msgque.listen()
+				LogDebug("process listen end for ws msgque:%d", msgque.id)
+			})
+		}
+
 	}
 	return nil
 }
