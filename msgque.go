@@ -462,6 +462,7 @@ type IMsgQue interface {
 }
 
 type IFactory struct {
+	Type MsgType
 	Handler IMsgHandler
 	Parser IParserFactory
 }
@@ -474,7 +475,7 @@ func StartServer(addr string, typ MsgType, factory ...IFactory) error {
 		listen, err := net.Listen("tcp", addrs[1])
 		if err == nil {
 			for _, v:= range factory{
-				msgque := newTcpListen(listen, typ, v.Handler, v.Parser, addr)
+				msgque := newTcpListen(listen, v.Type, v.Handler, v.Parser, addr)
 				Go(func() {
 					LogDebug("process listen for tcp msgque:%d", msgque.id)
 					msgque.listen()
