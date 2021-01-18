@@ -13,10 +13,6 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 		return nil, ErrCustomUnPack
 	}
 
-	if len(msg.Data) == 0 {
-		return nil, ErrCustomUnPack
-	}
-
 	headData := make([]byte, MsgShortHeadSize)
 	var data []byte
 	var head *MessageShortHead
@@ -29,14 +25,12 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 
 	LogDebug("head %v", headData)
 	msg.ShortHead = head
-	if head.Len > 0 {
-		data = make([]byte, head.Len)
-		data = msg.Data[MsgShortHeadSize:]
-		msg.Data = data
-		LogDebug("data len: %v %v",head.Len, msg.Data)
-	}else{
-		return nil, ErrCustomUnPack
-	}
+
+	data = make([]byte, head.Len)
+	data = msg.Data[MsgShortHeadSize:]
+	msg.Data = data
+	LogDebug("data len: %v %v",head.Len, msg.Data)
+
 
 	for _, p := range r.typeMap {
 		if p.C2S() != nil {
