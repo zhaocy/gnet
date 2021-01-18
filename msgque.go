@@ -496,9 +496,7 @@ func StartServer(addr string, factory ...IFactory) error {
 		if addrs[0] == "wss" {
 			Config.EnableWss = true
 		}
-		if typ != MsgTypeCmd {
-			LogInfo("ws type msgque noly support MsgTypeCmd now auto set to MsgTypeCmd")
-		}
+
 		for _, v:= range factory{
 			msgque := newWsListen(naddr[0], url, MsgTypeCmd, v.Handler, v.Parser)
 			Go(func() {
