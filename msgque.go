@@ -467,9 +467,7 @@ type IFactory struct {
 	Parser IParserFactory
 }
 
-
-
-func StartServer(addr string, typ MsgType, factory ...IFactory) error {
+func StartServer(addr string, factory ...IFactory) error {
 	addrs := strings.Split(addr, "://")
 	if addrs[0] == "tcp" || addrs[0] == "all" {
 		listen, err := net.Listen("tcp", addrs[1])
