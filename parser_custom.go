@@ -2,6 +2,7 @@ package gnet
 
 import (
 	"github.com/zhaocy/codec"
+	"reflect"
 )
 
 type CustomParser struct {
@@ -31,16 +32,17 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 	msg.Data = data
 	LogDebug("data len: %v %v",head.Len, msg.Data)
 
-
-	for _, p := range r.typeMap {
+	for k, p := range r.typeMap {
 		if p.C2S() != nil {
-
-			err := CustomUnPack(msg.Data, p.C2S())
-			if err != nil {
-				continue
+			if k == reflect.TypeOf(p.C2S()){
+				err := CustomUnPack(msg.Data, p.C2S())
+				if err != nil {
+					continue
+				}
+				p.parser = r
+				return &p, nil
 			}
-			p.parser = r
-			return &p, nil
+
 		}
 	}
 
