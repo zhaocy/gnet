@@ -393,6 +393,10 @@ func (r *DefMsgHandler) GetHandlerFunc(msgque IMsgQue, msg *Message) HandlerFunc
 		}else if r.msgMap != nil && msg.ShortHead!=nil{
 			if f, ok := r.msgMap[msg.ShortHead.CmdAct()]; ok {
 				return f
+			}else{
+				if f, ok := r.msgMap[0]; ok {
+					return f
+				}
 			}
 		}
 	} else if r.msgMap != nil {
@@ -421,6 +425,13 @@ func (r *DefMsgHandler) Register(cmd, act uint8, fun HandlerFunc) {
 		r.msgMap = map[int]HandlerFunc{}
 	}
 	r.msgMap[CmdAct(cmd, act)] = fun
+}
+
+func (r *DefMsgHandler) RegisterHandle(fun HandlerFunc){
+	if r.msgMap == nil {
+		r.msgMap = map[int]HandlerFunc{}
+	}
+	r.msgMap[0] = fun
 }
 
 //消息队列接口
