@@ -351,12 +351,14 @@ func (r *msgQue) processMsgTrue(msgque IMsgQue, msg *Message) bool {
 				return true
 			}
 		}
+
 	}
 	//如果发送的是回调消息，优先处理回调消息
 	if msgque.tryCallback(msg) {
 		return true
 	}
 	//获取处理消息函数
+
 	f := r.handler.GetHandlerFunc(msgque, msg)
 	if f == nil {
 		f = r.handler.OnProcessMsg
