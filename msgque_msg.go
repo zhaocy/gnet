@@ -34,14 +34,6 @@ type MessageHead struct {
 	data    []byte //数据
 }
 
-//定义短消息头
-type MessageShortHead struct {
-	Cmd uint16
-	Act uint16
-	Len uint16 //数据长度
-
-}
-
 func (r *MessageHead) Bytes() []byte {
 	if r.forever && r.data != nil {
 		return r.data
@@ -115,6 +107,13 @@ func (r *MessageHead) Tag() int {
 func (r *MessageHead) String() string {
 	return fmt.Sprintf("Len:%v Error:%v Cmd:%v Act:%v Index:%v Flags:%v", r.Len, r.Error, r.Cmd, r.Act, r.Index, r.Flags)
 }
+//定义短消息头
+type MessageShortHead struct {
+	Cmd uint16
+	Act uint16
+	Len uint16 //数据长度
+}
+
 
 func NewMessageHead(data []byte) *MessageHead {
 	head := &MessageHead{}
@@ -124,6 +123,9 @@ func NewMessageHead(data []byte) *MessageHead {
 	return head
 }
 
+func (s *MessageShortHead) CmdAct() int {
+	return CmdAct16(s.Cmd,s.Act)
+}
 
 func (s *MessageShortHead) FromBytes(data []byte) error {
 	if len(data) != MsgShortHeadSize {

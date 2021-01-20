@@ -31,7 +31,7 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 	msg.Data = data
 	LogDebug("data len: %v %v",head.Len, msg.Data)
 
-	if p, ok := r.msgMap[msg.Head.CmdAct()]; ok{
+	if p, ok := r.msgMap[msg.ShortHead.CmdAct()]; ok{
 		if p.C2S() != nil {
 			err := CustomUnPack(msg.Data, p.C2S())
 			if err != nil {
@@ -41,8 +41,6 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 			return &p, nil
 		}
 	}
-
-
 
 	return nil, ErrCustomUnPack
 }
