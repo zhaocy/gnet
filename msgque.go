@@ -390,6 +390,10 @@ func (r *DefMsgHandler) GetHandlerFunc(msgque IMsgQue, msg *Message) HandlerFunc
 			if f, ok := r.typeMap[reflect.TypeOf(msg.C2S())]; ok {
 				return f
 			}
+		}else if r.msgMap != nil && msg.ShortHead!=nil{
+			if f, ok := r.msgMap[msg.ShortHead.CmdAct()]; ok {
+				return f
+			}
 		}
 	} else if r.msgMap != nil {
 		if f, ok := r.msgMap[msg.CmdAct()]; ok {
