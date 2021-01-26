@@ -259,3 +259,22 @@ func NewDataMsg(data []byte) *Message {
 		Data: data,
 	}
 }
+
+func NewHeadDataMsg(cmd, act uint16,resp interface{}) *Message{
+	msg:= &Message{}
+	if resp!=nil{
+		dataByte, _ := CustomPack(resp)
+		head:=&MessageShortHead{
+			Cmd: cmd,
+			Act: act,
+			Len: uint16(len(dataByte)),
+		}
+		headByte, _ := CustomPack(head)
+		allData := BytesConnect(headByte, dataByte)
+		msg = &Message{
+			ShortHead:head,
+			Data:allData,
+		}
+	}
+	return msg
+}
