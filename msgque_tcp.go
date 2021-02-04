@@ -95,19 +95,19 @@ func (r *tcpMsgQue) readMsgCustom() {
 			break
 		}
 
-		if scanner.Scan(){
+		//if scanner.Scan(){
 			for scanner.Scan(){
 				if !r.processMsg(r, &Message{Data: scanner.Bytes()}) {
 					break
 				}
 			}
-		}else{
-			data = make([]byte, len)
-			copy(data, r.rawBuffer)
-			if !r.processMsg(r, &Message{Data: data}) {
-				break
-			}
-		}
+		//}else{
+		//	data = make([]byte, len)
+		//	copy(data, r.rawBuffer)
+		//	if !r.processMsg(r, &Message{Data: data}) {
+		//		break
+		//	}
+		//}
 
 
 		r.lastTick = Timestamp
