@@ -13,6 +13,7 @@ type HandlerFunc func(msgque IMsgQue, msg *Message) bool
 type MsgType int //消息类型
 const (
 	MsgTypeMsg MsgType = iota //消息基于确定的消息头
+	MsgTypeCustom 			  //自定义消息消息头
 	MsgTypeCmd                //消息没有消息头，以\n分割
 )
 

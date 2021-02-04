@@ -73,10 +73,10 @@ func (r *tcpMsgQue) RemoteAddr() string {
 	return r.address
 }
 
-func (r *tcpMsgQue) readMsg() {
-	headData := make([]byte, MsgHeadSize)
+func (r *tcpMsgQue) readMsgCustom() {
+	headData := make([]byte, MsgShortHeadSize)
 	var data []byte
-	var head *MessageHead
+	var head *MessageShortHead
 
 	for !r.IsStop() {
 		if head == nil {
@@ -88,13 +88,13 @@ func (r *tcpMsgQue) readMsg() {
 				break
 			}
 
-			if head = NewMessageHead(headData); head == nil {
+			if head = NewMessageShortHead(headData); head == nil {
 				LogError("msgque:%v read msg head failed", r.id)
 				break
 			}
 
 			if head.Len == 0 {
-				if !r.processMsg(r, &Message{Head: head}) {
+				if !r.processMsg(r, &Message{ShortHead: head}) {
 					LogError("msgque:%v process msg cmd:%v act:%v", r.id, head.Cmd, head.Act)
 					break
 				}
@@ -110,7 +110,7 @@ func (r *tcpMsgQue) readMsg() {
 				break
 			}
 
-			if !r.processMsg(r, &Message{Head: head, Data: data}) {
+			if !r.processMsg(r, &Message{ShortHead: head, Data: data}) {
 				LogError("msgque:%v process msg cmd:%v act:%v", r.id, head.Cmd, head.Act)
 				break
 			}
@@ -243,37 +243,76 @@ func(r *tcpMsgQue) packetSlitFunc(data []byte, atEOF bool) (advance int, token [
 	return
 }
 
+func (r *tcpMsgQue) readMsg() {
+	headData := make([]byte, MsgHeadSize)
+	var data []byte
+	var head *MessageHead
+
+	for !r.IsStop() {
+		if head == nil {
+			_, err := io.ReadFull(r.conn, headData)
+			if err != nil {
+				if err != io.EOF {
+					LogDebug("msgque:%v recv data err:%v", r.id, err)
+				}
+				break
+			}
+
+			if head = NewMessageHead(headData); head == nil {
+				LogError("msgque:%v read msg head failed", r.id)
+				break
+			}
+
+			if head.Len == 0 {
+				if !r.processMsg(r, &Message{Head: head}) {
+					LogError("msgque:%v process msg cmd:%v act:%v", r.id, head.Cmd, head.Act)
+					break
+				}
+				head = nil
+			} else {
+				data = make([]byte, head.Len)
+			}
+
+		} else {
+			_, err := io.ReadFull(r.conn, data)
+			if err != nil {
+				LogError("msgque:%v recv data err:%v", r.id, err)
+				break
+			}
+
+			if !r.processMsg(r, &Message{Head: head, Data: data}) {
+				LogError("msgque:%v process msg cmd:%v act:%v", r.id, head.Cmd, head.Act)
+				break
+			}
+
+			head = nil
+			data = nil
+		}
+		r.lastTick = Timestamp
+	}
+}
+
 func (r *tcpMsgQue) readCmd() {
 	reader := bufio.NewReader(r.conn)
 	var err error
 	var len int
-	//var data []byte
-	result := bytes.NewBuffer(nil)
-
+	var data []byte
 	for !r.IsStop() {
 		if r.rawBuffer != nil {
 			len, err = reader.Read(r.rawBuffer)
-			result.Write(r.rawBuffer[0:len])
 			if err == nil && len > 0 {
-				//data = make([]byte, len)
-				//copy(data, r.rawBuffer)
-				scanner := bufio.NewScanner(result)
-				scanner.Split(r.packetSlitFunc)
-				for scanner.Scan() {
-					if !r.processMsg(r, &Message{Data: scanner.Bytes()[6:]}) {
-						break
-					}
-				}
+				data = make([]byte, len)
+				copy(data, r.rawBuffer)
 			}
-
-		} /*else {
+		} else {
 			data, err = reader.ReadBytes('\n')
-		}*/
+		}
 		if err != nil {
 			break
 		}
-
-
+		if !r.processMsg(r, &Message{Data: data}) {
+			break
+		}
 		r.lastTick = Timestamp
 	}
 }
@@ -332,7 +371,9 @@ func (r *tcpMsgQue) read() {
 	r.wait.Add(1)
 	if r.msgType == MsgTypeCmd{
 		r.readCmd()
-	} else{
+	} else if r.msgType == MsgTypeCustom{
+		r.readMsgCustom()
+	}else{
 		r.readMsg()
 	}
 }
