@@ -375,7 +375,7 @@ func (r *tcpMsgQue) write() {
 		r.Stop()
 	}()
 	r.wait.Add(1)
-	if r.msgType == MsgTypeCmd {
+	if r.msgType == MsgTypeCmd || r.msgType == MsgTypeCustom{
 		r.writeCmd()
 	} else {
 		if r.sendFast {
