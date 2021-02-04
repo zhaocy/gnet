@@ -249,11 +249,11 @@ func (r *tcpMsgQue) readCmd() {
 	var len int
 	//var data []byte
 	result := bytes.NewBuffer(nil)
-	var buf [1<<12]byte
+
 	for !r.IsStop() {
 		if r.rawBuffer != nil {
 			len, err = reader.Read(r.rawBuffer)
-			result.Write(buf[0:len])
+			result.Write(r.rawBuffer[0:len])
 			if err == nil && len > 0 {
 				//data = make([]byte, len)
 				//copy(data, r.rawBuffer)
