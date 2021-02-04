@@ -28,7 +28,7 @@ func (r *CustomParser) ParseC2S(msg *Message) (IMsgParser, error) {
 
 	data = make([]byte, head.Len)
 	data = msg.Data[MsgShortHeadSize:]
-	msg.Data = data
+	msg.Data = data[:head.Len]
 	LogDebug("data len: %v %v",head.Len, msg.Data)
 
 	if p, ok := r.msgMap[msg.ShortHead.CmdAct()]; ok{
