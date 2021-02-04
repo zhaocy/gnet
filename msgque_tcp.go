@@ -228,7 +228,7 @@ func(r *tcpMsgQue) packetSlitFunc(data []byte, atEOF bool) (advance int, token [
 		LogError("short read msg head failed")
 		return 0,nil, errors.New("short read msg head failed")
 	}
-	if !atEOF && len(data) > 6 {
+	if !atEOF && len(data) >= 6 {
 		pl := int(head.Len) + 6
 		if pl <= len(data) {
 			return pl, data[:pl], nil
