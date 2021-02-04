@@ -96,7 +96,7 @@ func (r *tcpMsgQue) readMsgCustom() {
 		}
 
 		for scanner.Scan(){
-			if !r.processMsg(r, &Message{Data: data}) {
+			if !r.processMsg(r, &Message{Data: scanner.Bytes()}) {
 				break
 			}
 		}
