@@ -78,7 +78,7 @@ func (r *tcpMsgQue) readMsgCustom() {
 	var err error
 	var len int
 	var scanner *bufio.Scanner
-	var data []byte
+	//var data []byte
 	for !r.IsStop() {
 		if r.rawBuffer != nil {
 			result := bytes.NewBuffer(nil)
@@ -88,9 +88,9 @@ func (r *tcpMsgQue) readMsgCustom() {
 				scanner = bufio.NewScanner(result)
 				scanner.Split(r.packetSlitFunc)
 			}
-		} else {
+		} /*else {
 			data, err = reader.ReadBytes('\n')
-		}
+		}*/
 		if err != nil {
 			break
 		}
