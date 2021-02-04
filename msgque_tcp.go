@@ -2,6 +2,8 @@ package gnet
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/binary"
 	"io"
 	"net"
 	"sync"
@@ -227,27 +229,51 @@ func (r *tcpMsgQue) writeMsg() {
 	tick.Stop()
 }
 
+func(r *tcpMsgQue) packetSlitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	// 检查 atEOF 参数 和 数据包头部的四个字节是否 为 0x123456(我们定义的协议的魔数)
+	if !atEOF && len(data) > 6 && binary.BigEndian.Uint32(data[:4]) == 0x123456 {
+		var l int16
+		// 读出 数据包中 实际数据 的长度(大小为 0 ~ 2^16)
+		binary.Read(bytes.NewReader(data[4:6]), binary.BigEndian, &l)
+		pl := int(l) + 6
+		if pl <= len(data) {
+			return pl, data[:pl], nil
+		}
+	}
+	return
+}
+
 func (r *tcpMsgQue) readCmd() {
 	reader := bufio.NewReader(r.conn)
 	var err error
 	var len int
-	var data []byte
+	//var data []byte
+	result := bytes.NewBuffer(nil)
+	var buf [1<<12]byte
 	for !r.IsStop() {
 		if r.rawBuffer != nil {
 			len, err = reader.Read(r.rawBuffer)
+			result.Write(buf[0:len])
 			if err == nil && len > 0 {
-				data = make([]byte, len)
-				copy(data, r.rawBuffer)
+				//data = make([]byte, len)
+				//copy(data, r.rawBuffer)
+				scanner := bufio.NewScanner(result)
+				scanner.Split(r.packetSlitFunc)
+				for scanner.Scan() {
+					if !r.processMsg(r, &Message{Data: scanner.Bytes()[6:]}) {
+						break
+					}
+				}
 			}
-		} else {
+
+		} /*else {
 			data, err = reader.ReadBytes('\n')
-		}
+		}*/
 		if err != nil {
 			break
 		}
-		if !r.processMsg(r, &Message{Data: data}) {
-			break
-		}
+
+
 		r.lastTick = Timestamp
 	}
 }
