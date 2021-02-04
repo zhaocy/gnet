@@ -3,7 +3,7 @@ package gnet
 import (
 	"bufio"
 	"bytes"
-	"encoding/binary"
+	"errors"
 	"io"
 	"net"
 	"sync"
@@ -74,50 +74,33 @@ func (r *tcpMsgQue) RemoteAddr() string {
 }
 
 func (r *tcpMsgQue) readMsgCustom() {
-	headData := make([]byte, MsgShortHeadSize)
+	reader := bufio.NewReader(r.conn)
+	var err error
+	var len int
 	var data []byte
-	var head *MessageShortHead
-
+	var scanner *bufio.Scanner
 	for !r.IsStop() {
-		if head == nil {
-			_, err := io.ReadFull(r.conn, headData)
-			if err != nil {
-				if err != io.EOF {
-					LogDebug("msgque:%v recv data err:%v", r.id, err)
-				}
-				break
+		if r.rawBuffer != nil {
+			result := bytes.NewBuffer(nil)
+			len, err = reader.Read(r.rawBuffer)
+			result.Write(r.rawBuffer[0:len])
+			if err == nil && len > 0 {
+				scanner = bufio.NewScanner(result)
+				scanner.Split(r.packetSlitFunc)
 			}
-
-			if head = NewMessageShortHead(headData); head == nil {
-				LogError("msgque:%v read msg head failed", r.id)
-				break
-			}
-
-			if head.Len == 0 {
-				if !r.processMsg(r, &Message{ShortHead: head}) {
-					LogError("msgque:%v process msg cmd:%v act:%v", r.id, head.Cmd, head.Act)
-					break
-				}
-				head = nil
-			} else {
-				data = make([]byte, head.Len)
-			}
-
 		} else {
-			_, err := io.ReadFull(r.conn, data)
-			if err != nil {
-				LogError("msgque:%v recv data err:%v", r.id, err)
-				break
-			}
-
-			if !r.processMsg(r, &Message{ShortHead: head, Data: data}) {
-				LogError("msgque:%v process msg cmd:%v act:%v", r.id, head.Cmd, head.Act)
-				break
-			}
-
-			head = nil
-			data = nil
+			data, err = reader.ReadBytes('\n')
 		}
+		if err != nil {
+			break
+		}
+
+		for scanner.Scan(){
+			if !r.processMsg(r, &Message{Data: data}) {
+				break
+			}
+		}
+
 		r.lastTick = Timestamp
 	}
 }
@@ -230,12 +213,14 @@ func (r *tcpMsgQue) writeMsg() {
 }
 
 func(r *tcpMsgQue) packetSlitFunc(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	// 检查 atEOF 参数 和 数据包头部的四个字节是否 为 0x123456(我们定义的协议的魔数)
-	if !atEOF && len(data) > 6 && binary.BigEndian.Uint32(data[:4]) == 0x123456 {
-		var l int16
-		// 读出 数据包中 实际数据 的长度(大小为 0 ~ 2^16)
-		binary.Read(bytes.NewReader(data[4:6]), binary.BigEndian, &l)
-		pl := int(l) + 6
+	var head *MessageShortHead
+	headData := data[:MsgShortHeadSize]
+	if head = NewMessageShortHead(headData); head == nil {
+		LogError("short read msg head failed")
+		return 0,nil, errors.New("short read msg head failed")
+	}
+	if !atEOF && len(data) > 6 {
+		pl := int(head.Len) + 6
 		if pl <= len(data) {
 			return pl, data[:pl], nil
 		}
