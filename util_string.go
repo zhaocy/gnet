@@ -1,6 +1,7 @@
 package gnet
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -103,4 +104,8 @@ func StrTrimRight(s, cutset string) string {
 
 func TrimRightStr(s, cutset string) string {
 	return strings.TrimRight(s, cutset)
+}
+
+func Int32ToStr(i int32) string{
+	return strconv.Itoa(int(i))
 }
