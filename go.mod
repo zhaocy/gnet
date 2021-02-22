@@ -1,4 +1,4 @@
-module github.com/zhaocy/gnet
+module gitee.com/gene-zhao/gnet
 
 go 1.15
 
